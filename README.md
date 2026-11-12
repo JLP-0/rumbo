@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-[Uploading README.md…]()
-=======
->>>>>>> 398f91f (chore: move repository root to monorepo (api/ + docs/))
 # Rumbo
 
 **Turn any goal into a measurable plan, and always know if you're on track.**
@@ -10,7 +6,7 @@ Rumbo is an AI-powered goal tracking app. You describe any goal in natural langu
 
 > 🚧 **Status:** in active development. See the [roadmap](#roadmap) for what's done and what's next.
 
-🔗 **Project page:** https://YOUR-USERNAME.github.io/rumbo
+🔗 **Project page:** https://JLP-0.github.io/rumbo
 
 ![What Rumbo solves](docs/assets/rumbo-value-en.png)
 
@@ -70,7 +66,7 @@ Rumbo works for **any** goal by reducing it to four generic building blocks and 
 **Requirements:** Docker, [uv](https://docs.astral.sh/uv/) and Python 3.12.
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/rumbo.git
+git clone https://github.com/jlp-0/rumbo.git
 cd rumbo
 
 # 1. Configure environment variables
@@ -192,12 +188,4 @@ Request flow: `router → service → repository → database`. Routers handle H
 ## Author
 
 **Jefferson López Porras**: Backend Engineer (Python, SQL, APIs, LLM integration).
-<<<<<<< HEAD
-[LinkedIn](https://www.linkedin.com/in/jeff-lp) · [GitHub](https://github.com/YOUR-USERNAME)
-
-## License
-
-MIT
-=======
 [LinkedIn](https://www.linkedin.com/in/jeff-lp) · [GitHub](https://github.com/JLP-0)
->>>>>>> 398f91f (chore: move repository root to monorepo (api/ + docs/))
