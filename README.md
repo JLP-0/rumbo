@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 [Uploading README.md…]()
+=======
+>>>>>>> 398f91f (chore: move repository root to monorepo (api/ + docs/))
 # Rumbo
 
 **Turn any goal into a measurable plan, and always know if you're on track.**
@@ -189,8 +192,12 @@ Request flow: `router → service → repository → database`. Routers handle H
 ## Author
 
 **Jefferson López Porras**: Backend Engineer (Python, SQL, APIs, LLM integration).
+<<<<<<< HEAD
 [LinkedIn](https://www.linkedin.com/in/jeff-lp) · [GitHub](https://github.com/YOUR-USERNAME)
 
 ## License
 
 MIT
+=======
+[LinkedIn](https://www.linkedin.com/in/jeff-lp) · [GitHub](https://github.com/JLP-0)
+>>>>>>> 398f91f (chore: move repository root to monorepo (api/ + docs/))

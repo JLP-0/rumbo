@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rumbo — AI-powered goal tracking</title>
+  <meta name="description" content="Turn any goal into a measurable plan with AI, and always know if you're on track. Built with FastAPI, PostgreSQL, pgvector and LLMs.">
+  <style>
+    :root {
+      --primary: #0F4C5C;
+      --primary-2: #1F7A8C;
+      --accent: #FFD166;
+      --bg: #F6F8F9;
+      --card: #FFFFFF;
+      --text: #1b1b1b;
+      --muted: #5b6770;
+      --border: #E3E8EA;
+      --ok: #2A9D8F;
+      --warn: #F4A261;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    a { color: var(--primary-2); }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+    header { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; padding: 72px 0 88px; }
+    .brand { color: var(--accent); font-weight: 800; letter-spacing: 4px; font-size: 14px; }
+    h1 { font-size: clamp(32px, 5vw, 54px); line-height: 1.15; margin: 16px 0 20px; max-width: 800px; }
+    .lead { font-size: 19px; color: #DDF3F5; max-width: 700px; }
+    .buttons { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 12px 22px; border-radius: 10px; font-weight: 600; text-decoration: none; }
+    .btn-primary { background: var(--accent); color: var(--primary); }
+    .btn-ghost { border: 1.5px solid rgba(255,255,255,.6); color: #fff; }
+    .status { display: inline-block; margin-top: 20px; font-size: 14px; background: rgba(255,255,255,.12); padding: 6px 12px; border-radius: 999px; }
+
+    section { padding: 64px 0; }
+    h2 { font-size: 30px; color: var(--primary); margin-bottom: 8px; }
+    .section-lead { color: var(--muted); margin-bottom: 32px; max-width: 720px; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    .card h3 { font-size: 19px; margin: 12px 0 6px; }
+    .card p { color: var(--muted); font-size: 16px; }
+    .icon { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 22px; }
+
+    .steps { display: grid; gap: 18px; }
+    .step { display: flex; gap: 18px; align-items: flex-start; }
+    .step-num { flex: 0 0 48px; height: 48px; border-radius: 50%; background: var(--primary-2); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; }
+    .step h3 { font-size: 19px; }
+    .step p { color: var(--muted); }
+
+    .demo { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: center; }
+    .goal-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 28px; box-shadow: 0 10px 30px rgba(15,76,92,.08); }
+    .goal-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .badge { background: #FFF1D6; color: #B7791F; font-weight: 700; font-size: 14px; padding: 4px 12px; border-radius: 999px; }
+    .bar { height: 14px; background: #EEF1F2; border-radius: 999px; overflow: hidden; }
+    .bar span { display: block; width: 50%; height: 100%; background: var(--warn); }
+    .meta { color: var(--muted); font-size: 15px; margin: 10px 0 16px; }
+    .quote { font-size: 17px; }
+    .checks { list-style: none; display: grid; gap: 12px; }
+    .checks li { display: flex; gap: 12px; align-items: center; font-size: 17px; }
+    .checks li::before { content: "✓"; flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--ok); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+
+    .tech { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip { background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font-size: 15px; }
+    .decisions { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 28px; }
+    .decisions .card h3 { font-size: 17px; margin-top: 0; }
+
+    .diagram { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; }
+    .diagram img { width: 100%; height: auto; display: block; border-radius: 10px; }
+
+    footer { background: var(--primary); color: #DDF3F5; padding: 40px 0; text-align: center; }
+    footer a { color: var(--accent); }
+
+    @media (max-width: 780px) { .demo { grid-template-columns: 1fr; } header { padding: 56px 0 64px; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="brand">RUMBO</div>
+      <h1>Turn any goal into a plan you actually follow through on.</h1>
+      <p class="lead">Describe a goal in your own words. AI builds a measurable plan, and Rumbo tells you whether you're on track before it's too late.</p>
+      <div class="buttons">
+        <a class="btn btn-primary" href="https://github.com/YOUR-USERNAME/rumbo">View on GitHub</a>
+        <a class="btn btn-ghost" href="#architecture">See the architecture</a>
+      </div>
+      <div class="status">🚧 In active development</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+      <h2>The problem</h2>
+      <p class="section-lead">We all set goals. Most get abandoned, and rarely for lack of motivation.</p>
+      <div class="grid-3">
+        <div class="card">
+          <div class="icon" style="background:#8D99AE">?</div>
+          <h3>The goal is vague</h3>
+          <p>"I want to get better at something"… but what do I do today?</p>
+        </div>
+        <div class="card">
+          <div class="icon" style="background:#E76F51">!</div>
+          <h3>You notice too late</h3>
+          <p>Nothing tells you you're behind until it's too late to recover.</p>
+        </div>
+        <div class="card">
+          <div class="icon" style="background:#F4A261">↻</div>
+          <h3>History repeats</h3>
+          <p>You start over the same way as last time. Apps don't learn from your past attempts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#fff">
+    <div class="container">
+      <h2>How it works</h2>
+      <p class="section-lead">Any goal, any unit, any deadline.</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div><h3>Describe your goal in your own words</h3><p>Add a deadline. If key information is missing, Rumbo asks you.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div><h3>AI builds your plan</h3><p>What to measure, what to do each week and checkpoints, informed by your previous attempts.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div><h3>Log your progress in seconds</h3><p>From the web or Telegram. Rumbo reminds you what's left for today.</p></div></div>
+        <div class="step"><div class="step-num">4</div><div><h3>Always know if you're on track</h3><p>Required vs actual pace, projected finish date and what to adjust to get there.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container demo">
+      <div class="goal-card">
+        <div class="goal-top"><strong style="font-size:20px">Your goal</strong><span class="badge">⚠ At risk</span></div>
+        <div class="bar"><span></span></div>
+        <p class="meta">Progress: 50% · Streak: 6 days</p>
+        <p class="quote">"At this pace you'll finish 2 weeks late. Increase your weekly pace a little and you'll make it."</p>
+      </div>
+      <div>
+        <h2>What you get</h2>
+        <ul class="checks" style="margin-top:16px">
+          <li>Clarity on what to do today</li>
+          <li>Alerts before you fall behind</li>
+          <li>A plan that adapts to you</li>
+          <li>Your real progress, not just streaks</li>
+          <li>Works for any goal</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="architecture" style="background:#fff">
+    <div class="container">
+      <h2>Under the hood</h2>
+      <p class="section-lead">A backend-first system: the LLM plans and explains, a deterministic engine computes every number.</p>
+      <div class="diagram"><img src="assets/rumbo-architecture-en.png" alt="Rumbo architecture diagram"></div>
+
+      <div class="decisions">
+        <div class="card"><h3>Generic goal model</h3><p>No goal types hardcoded: metrics, routines and milestones describe any goal.</p></div>
+        <div class="card"><h3>Validated LLM output</h3><p>Structured outputs, Pydantic schemas and business rules, with retries and clarifying questions.</p></div>
+        <div class="card"><h3>RAG over your history</h3><p>pgvector search over past goals and notes, always scoped to the current user.</p></div>
+        <div class="card"><h3>Safe tool calling</h3><p>The assistant only calls read-only tools; the user identity comes from the JWT, never from the model.</p></div>
+        <div class="card"><h3>Measured, not guessed</h3><p>Evaluation datasets per prompt version and LLM-as-a-judge for generated reviews.</p></div>
+        <div class="card"><h3>Reliable by design</h3><p>Idempotency enforced by the database and an outbox for notifications that never get lost.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Tech stack</h2>
+      <div class="tech" style="margin-top:20px">
+        <span class="chip">Python 3.12</span><span class="chip">FastAPI</span><span class="chip">Pydantic v2</span>
+        <span class="chip">PostgreSQL 16</span><span class="chip">pgvector</span><span class="chip">SQLAlchemy 2</span><span class="chip">Alembic</span>
+        <span class="chip">LLM structured outputs</span><span class="chip">RAG</span><span class="chip">Tool calling</span><span class="chip">Evals</span><span class="chip">Langfuse</span>
+        <span class="chip">APScheduler</span><span class="chip">JWT</span><span class="chip">Vue 3</span>
+        <span class="chip">pytest</span><span class="chip">Ruff</span><span class="chip">GitHub Actions</span><span class="chip">Docker</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Built by <strong>Jefferson López Porras</strong>: Backend Engineer (Python, SQL, APIs, LLM integration)</p>
+      <p style="margin-top:8px"><a href="https://github.com/YOUR-USERNAME/rumbo">GitHub</a> · <a href="https://www.linkedin.com/in/jeff-lp">LinkedIn</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
